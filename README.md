@@ -17,5 +17,5 @@ Install the missing dependencies
 Run the app
 `npm start`
 
-##Philosophy behind the development 
+## Philosophy behind the development 
 To have fun.
