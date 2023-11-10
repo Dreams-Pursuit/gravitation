@@ -12,6 +12,8 @@
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     width: 30%;
+    transform-origin: top center;
+    /* transform: rotate(90deg); */
 }
 
 .board-cell {
