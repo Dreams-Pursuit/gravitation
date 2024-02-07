@@ -9,7 +9,7 @@ The game for the times when you are bored during Calculus class.
 
 ## Download and run the app 
 Copy the repository
-`git clone https://github.com/Jyrko/gravitation`
+`git clone https://github.com/Dreams-Pursuit/gravitation`
 
 Install the missing dependencies
 `npm install` or `yarn install`
