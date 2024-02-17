@@ -9,8 +9,8 @@ function PlayBoard() {
   const [currentPlayer, setCurrentPlayer] = React.useState("X");
   const [gameEnded, setGameEnded] = React.useState(false);
   const [hasGameStarted, setHasGameStarted] = useState(false);
-  const [time, setTime] = useState(0);
-  let isCirclePlaying = false;
+  const [time, setTime] = useState(1000);
+  const [winner, setWinner] = useState("");
 
   function generateEmptyCellValues() {
     const rows = new Array(GRID_HEIGHT)
@@ -24,26 +24,28 @@ function PlayBoard() {
     setRows(generateEmptyCellValues());
     setCurrentPlayer("X");
     setGameEnded(false);
-    setTime(0);
+    setTime(1000);
     document.querySelectorAll(".board-cell").forEach((cell) => {
       cell.innerHTML = "";
     });
   }
 
   function advancedMode(row, col) {
-    for(let i = 0; i < GRID_HEIGHT - 1; i++){                         //The function is used for the "Advanced mode"
-      for(let j = 0; j < GRID_WIDTH; j++){                       //where you can put cross(X) or null(O) whereever you want
-        if((i != row && j != col) && rows[i][j] == "" && rows[i + 1][j] != "")                  //However in this case it will fall in case it has nothing
-          [rows[i][j], rows[i + 1][j]] = [rows[i + 1][j], rows[i][j]];//under it.
+    for (let i = 0; i < GRID_HEIGHT - 1; i++) {
+      //The function is used for the "Advanced mode"
+      for (let j = 0; j < GRID_WIDTH; j++) {
+        //where you can put cross(X) or null(O) whereever you want
+        if (i !== row && j !== col && rows[i][j] === "" && rows[i + 1][j] !== "")
+          //However in this case it will fall in case it has nothing
+          [rows[i][j], rows[i + 1][j]] = [rows[i + 1][j], rows[i][j]]; //under it.
       }
     }
     return rows;
   }
-  function classicMode(row, col){ //function to validate index
-    if(row == 0)
-      return true;
-    else
-      return rows[row - 1][col] !== "";
+  function classicMode(row, col) {
+    //function to validate index
+    if (row == 0) return true;
+    else return rows[row - 1][col] !== "";
   }
 
   function isThereAWinner() {
@@ -56,13 +58,14 @@ function PlayBoard() {
     for (let row = 0; row < GRID_HEIGHT; row++) {
       hitsHor = 1;
       for (let col = 1; col < GRID_WIDTH; col++) {
-        if (rows[row][col] === rows[row][col - 1] && rows[row][col] != "") {
+        if (rows[row][col] === rows[row][col - 1] && rows[row][col] !== "") {
           hitsHor++;
-          console.log(`Horizontal:[${row},${col}],${rows[row][col]} ${hitsHor}`)
-        }else hitsHor = 1;
+          //console.log(`Horizontal:[${row},${col}],${rows[row][col]} ${hitsHor}`)
+        } else hitsHor = 1;
 
-        if (hitsHor == 4) {
+        if (hitsHor === 4) {
           console.log(`The player ${rows[row][col]} won! Congratulations.`);
+          setWinner(rows[row][col]);
           return true;
         }
       }
@@ -72,119 +75,100 @@ function PlayBoard() {
     for (let col = 0; col < GRID_WIDTH; col++) {
       hitsVer = 1;
       for (let row = 1; row < GRID_HEIGHT; row++) {
-        if (rows[row][col] == rows[row - 1][col] && rows[row][col] != "") {
+        if (rows[row][col] === rows[row - 1][col] && rows[row][col] !== "") {
           hitsVer++;
-          console.log(`Vertical:[${row},${col}], ${rows[row][col]} ${hitsVer}`);
-        }else hitsVer = 1;
+          //console.log(`Vertical:[${row},${col}], ${rows[row][col]} ${hitsVer}`);
+        } else hitsVer = 1;
 
-        if (hitsVer == 4) {
+        if (hitsVer === 4) {
           console.log(`The player ${rows[row][col]} won! Congratulations.`);
+          setWinner(rows[row][col]);
           return true;
         }
       }
     }
+    //Diagonal check
+    for (let c = 0; c < GRID_WIDTH; c++) {
+      hitsRD = 1;
+      for (let row = 1; row < GRID_HEIGHT; row++) {
+        if (
+          rows[row][(row + c) % GRID_WIDTH] ===
+            rows[row - 1][((row + c) % GRID_WIDTH) - 1] &&
+          rows[row][(row + c) % GRID_WIDTH] !== ""
+        ) {
+          console.log(
+            `right diagonal hit [${row},${(row + c) % GRID_WIDTH}] ${
+              rows[row][(row + c) % GRID_WIDTH]
+            }`
+          );
+          hitsRD++;
+        } else hitsRD = 1;
+
+        if (hitsRD === 4) {
+          console.log(
+            `The player ${
+              rows[row][(row + c) % GRID_WIDTH]
+            } won! Congratulations`
+          );
+          setWinner(rows[row][(row + c) % GRID_WIDTH])
+          return true;
+        }
+      }
+    }
+    //Antidiagonal check
+    for (let c = 0; c < GRID_WIDTH; c++) {
+      let hitsLD = 1;
+      for (let row = 1; row < GRID_HEIGHT; row++) {
+          if (
+              rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] ===
+              rows[row - 1][(GRID_WIDTH - row + c) % GRID_WIDTH] &&
+              rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] !== ""
+          ) {
+              console.log(
+                  `left diagonal hit [${row},${(GRID_WIDTH - 1 - row + c) % GRID_WIDTH}] ${
+                  rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]
+                  }`
+              );
+              hitsLD++;
+          } else hitsLD = 1;
+
+          if (hitsLD === 4) {
+              console.log(
+                  `The player ${
+                  rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]
+                  } won! Congratulations`
+              );
+              setWinner(rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]);
+              return true;
+          }
+      }
   }
-
-  // function isThereAWinner() {
-  //   //HorizontalCheck
-  //   let hitsHorizontal = 1;
-  //   let hitsVertical = 1;
-  //   let hitsDiagonalLeft = 1;
-  //   let hitsDiagonalRight = 1;
-
-  //   let currentIndex;
-
-  //   for (let r = 0; r < GRID_HEIGHT; r++) {
-  //     hitsHorizontal = 1;
-
-  //     for (let c = 1; c < GRID_WIDTH; c++) {
-  //       currentIndex = r * GRID_WIDTH + c;
-
-  //       const prevHor = rows[currentIndex - 1];
-
-  //       //Horizontal check
-  //       if (prevHor === rows[currentIndex] && prevHor !== "") {
-  //         console.log(`Horizontal hit ${hitsHorizontal}. Symbol ${prevHor}. Row: ${r}. Column: ${c}`);
-  //         hitsHorizontal++;
-  //         if (hitsHorizontal === 4) {
-  //           console.log("Winner winner chicken dinner");
-  //           return true;
-  //         }
-  //       } else {
-  //         hitsHorizontal = 1;
-  //       }
-
-  //       //Vertical check
-  //       for (let i = 1; i < GRID_HEIGHT; i++) {
-  //         let index = i * GRID_WIDTH + c;
-  //         const prev = rows[index - GRID_WIDTH];
-  //         if (prev === rows[index] && prev !== "") {
-  //           console.log(`Vertical hit ${hitsVertical}. Symbol ${prev}. Row: ${r}. Column: ${c}`);
-  //           hitsVertical++;
-  //           if (hitsVertical === 4) {
-  //             console.log("Winner winner chicken dinner");
-  //             return true;
-  //           }
-  //         } else {
-  //           hitsVertical = 1;
-  //         }
-  //       }
-
-  //       //Diagonal right
-  //       // for (let i = 1, j = c + 1; i < GRID_HEIGHT && j < GRID_WIDTH; i++, j++) {
-  //       //   let index = i * GRID_WIDTH + j;
-  //       //   const prev = rows[index - GRID_WIDTH - 1];
-
-  //       //   if (prev != "" && rows[index] != "") {
-  //       //     console.log(`Prev. Row: ${i - 1}. Column: ${j - 1}. Symbol ${prev}`);
-  //       //     console.log(`Current. Row: ${i}. Column: ${j}. Symbol ${rows[index]}`);
-  //       //   }
-
-  //       //   if (prev === rows[index] && prev != "") {
-  //       //     console.log(`Diag hit ${hitsDiagonalRight}. Symbol ${prev}. Row: ${r}. Column: ${c}`);
-  //       //     hitsDiagonalRight++;
-  //       //     if (hitsDiagonalRight === 4) {
-  //       //       console.log("Winner winner chicken dinner");
-  //       //       return true;
-  //       //     }
-  //       //   } else {
-  //       //     hitsDiagonalRight = 1;
-  //       //   }
-  //       // }
-  //     }
-  //   }
-  //   // setGameEnded(true);
-  //   return false;
-  // }
+    return false;
+  }
 
   function cellHandler(cell) {
     const newRows = rows;
-    //const index = e.target.getAttribute("data-index");
     const row = cell.target.getAttribute("data-row_index");
     const col = cell.target.getAttribute("data-col_index");
-    // const row = Math.floor(index / GRID_WIDTH); //Transformation from 1D to 2D coordinates
-    // const col = index % GRID_WIDTH;
-
-    if (!hasGameStarted) setHasGameStarted(true);
 
     if (!cell.target.innerHTML && !gameEnded) {
-      if(classicMode(row,col)){
+      if (classicMode(row, col)) {
         cell.target.innerHTML = currentPlayer;
         rows[row][col] = currentPlayer;
-      }else{
-        console.log(`Impossoble to put ${currentPlayer} here - not a based field!`);
+      } else {
+        console.log(
+          `Impossoble to put ${currentPlayer} here - not a based field!`
+        );
         return;
       }
-
-      isCirclePlaying = !isCirclePlaying;
-      setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
-
+      if (!hasGameStarted) setHasGameStarted(true);
       if (isThereAWinner()) {
         setGameEnded(true);
+      } else {
+        setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
+        setTime(1000);
       }
     }
-    // setCurrentPlayer(isCirclePlaying ? "O" : "X"); //Causes the bug
-    // console.log(twoDimToOneDimCoords(2, 2))
     console.log("Clicked: [" + row + "," + col + "]");
     setRows(newRows);
     console.log(rows);
@@ -207,22 +191,6 @@ function PlayBoard() {
     );
   }
 
-  // function generateGrid() {
-  //   return rows.map((element, index, array) => {
-  //     // console.log("Index - " + index + " element: " + element);
-  //     return (
-  //       <div
-  //         key={"cell-" + (index)}
-  //         data-index={index} //Fix here to not duplicate data
-  //         className="board-cell"
-  //         onClick={cellHandler}
-  //       >
-  //         {element}
-  //       </div>
-  //     );
-  //   });
-  // }
-
   React.useEffect(() => {
     let intervalId;
     if (!rows) {
@@ -230,9 +198,17 @@ function PlayBoard() {
       setRows(generateEmptyCellValues());
     }
     if (hasGameStarted) {
+      if (time === 0) {
+        setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
+        setTime(1000);
+      }
       intervalId = setInterval(() => {
-        setTime(time + 1);
+        setTime(time - 1);
       }, 10);
+    }
+
+    if (gameEnded) {
+      clearInterval(intervalId);
     }
 
     return () => {
@@ -240,7 +216,6 @@ function PlayBoard() {
     };
   }, [rows, hasGameStarted, time]);
 
-  //const hours = Math.floor(time / 360000);
   const minutes = Math.floor((time % 360000) / 6000);
   const seconds = Math.floor((time % 6000) / 100);
   const milliseconds = time % 100;
@@ -256,7 +231,7 @@ function PlayBoard() {
       </div>
       <div>
         {gameEnded ? (
-          <h3>The winner - {currentPlayer === "X" ? "O" : "X"}!</h3>
+          <h3>The winner - {winner}!</h3>
         ) : (
           <h3>Your turn: {currentPlayer}</h3>
         )}
