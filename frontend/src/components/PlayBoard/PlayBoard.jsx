@@ -3,11 +3,10 @@ import { GRID_HEIGHT, GRID_WIDTH } from "../../functions/constants";
 import "../../css/PlayBoard.css";
 
 
-function PlayBoard({ setGameStarted, isOfflineMode }) {
+function PlayBoard({hasGameStarted ,setGameStarted, isOfflineMode }) {
   const [rows, setRows] = React.useState(generateEmptyCellValues()); // Find a more efficient way
   const [currentPlayer, setCurrentPlayer] = React.useState("X");
   const [gameEnded, setGameEnded] = React.useState(false);
-  const [hasGameStarted, setHasGameStarted] = useState(false);
   const [time, setTime] = useState(1000);
   const [winner, setWinner] = useState("");
 
@@ -43,19 +42,15 @@ function PlayBoard({ setGameStarted, isOfflineMode }) {
   }
   function classicMode(row, col) {
     //function to validate index
-    if (row == 0) return true;
+    if (row === "0") return true;
     else return rows[row - 1][col] !== "";
   }
 
   function isThereAWinner() {
-    let hitsHor = 1,
-      hitsVer = 1,
-      hitsRD = 1,
-      hitsLD = 1;
     //Horizontal matching check
     console.log(rows);
     for (let row = 0; row < GRID_HEIGHT; row++) {
-      hitsHor = 1;
+      let hitsHor = 1;
       for (let col = 1; col < GRID_WIDTH; col++) {
         if (rows[row][col] === rows[row][col - 1] && rows[row][col] !== "") {
           hitsHor++;
@@ -72,7 +67,7 @@ function PlayBoard({ setGameStarted, isOfflineMode }) {
 
     //Vertical matching check
     for (let col = 0; col < GRID_WIDTH; col++) {
-      hitsVer = 1;
+      let hitsVer = 1;
       for (let row = 1; row < GRID_HEIGHT; row++) {
         if (rows[row][col] === rows[row - 1][col] && rows[row][col] !== "") {
           hitsVer++;
@@ -88,7 +83,7 @@ function PlayBoard({ setGameStarted, isOfflineMode }) {
     }
     //Diagonal check
     for (let c = 0; c < GRID_WIDTH; c++) {
-      hitsRD = 1;
+      let hitsRD = 1;
       for (let row = 1; row < GRID_HEIGHT; row++) {
         if (
           rows[row][(row + c) % GRID_WIDTH] ===

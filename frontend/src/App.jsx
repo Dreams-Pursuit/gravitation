@@ -28,7 +28,7 @@ function App() {
 
   return (
     <div className="App">
-      { hasGameStarted ? <PlayBoard setGameStarted={setGameStarted} isOfflineMode={offlineMode}/> : <StartScreen setGameStarted={setGameStarted} setOfflineMode={setOfflineMode}/> }
+      { hasGameStarted ? <PlayBoard hasGameStarted={hasGameStarted} setGameStarted={setGameStarted} isOfflineMode={offlineMode}/> : <StartScreen setGameStarted={setGameStarted} setOfflineMode={setOfflineMode}/> }
     </div>
   );
 }
