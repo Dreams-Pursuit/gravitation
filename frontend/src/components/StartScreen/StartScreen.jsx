@@ -1,12 +1,12 @@
 // import React from "react";
 import "../../css/StartScreen.css";
 
-function StartScreen({ setGameStarted, setOfflineMode }) {
+function StartScreen({ setGameSetup, setOfflineMode }) {
 
-  function onStartOfflineModeButton(e) {
+  function onSetup(e) {
     e.preventDefault();
     if (e.target.id === "offline-mode-btn") setOfflineMode(true);
-    setGameStarted(true);
+    setGameSetup(true);
   }
 
   return (
@@ -15,8 +15,8 @@ function StartScreen({ setGameStarted, setOfflineMode }) {
       <p><i>Empower yourself by an extase from each move</i></p>
       <br />
       <br />
-      <button id="offline-mode-btn" className="choose-mode-btn" onClick={onStartOfflineModeButton}>Offline Mode</button>
-      <button className="choose-mode-btn" onClick={onStartOfflineModeButton}>Multiplayer</button>
+      <button id="offline-mode-btn" className="choose-mode-btn" onClick={onSetup}>Offline Mode</button>
+      <button className="choose-mode-btn" onClick={onSetup}>Multiplayer</button>
     </div>
   );
 }

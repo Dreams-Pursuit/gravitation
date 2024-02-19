@@ -3,7 +3,7 @@ import { GRID_HEIGHT, GRID_WIDTH } from "../../functions/constants";
 import "../../css/PlayBoard.css";
 
 
-function PlayBoard({hasGameStarted ,setGameStarted, isOfflineMode }) {
+function PlayBoard({ hasGameStarted ,setGameStarted, isOfflineMode }) {
   const [rows, setRows] = React.useState(generateEmptyCellValues()); // Find a more efficient way
   const [currentPlayer, setCurrentPlayer] = React.useState("X");
   const [gameEnded, setGameEnded] = React.useState(false);
