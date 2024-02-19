@@ -3,11 +3,10 @@ import { GRID_HEIGHT, GRID_WIDTH } from "../../functions/constants";
 import "../../css/PlayBoard.css";
 
 
-function PlayBoard({ setGameStarted, isOfflineMode }) {
+function PlayBoard({hasGameStarted, setGameStarted, isOfflineMode }) {
   const [rows, setRows] = React.useState(generateEmptyCellValues()); // Find a more efficient way
   const [currentPlayer, setCurrentPlayer] = React.useState("X");
   const [gameEnded, setGameEnded] = React.useState(false);
-  const [hasGameStarted, setHasGameStarted] = useState(false);
   const [time, setTime] = useState(1000);
   const [winner, setWinner] = useState("");
 
@@ -43,7 +42,7 @@ function PlayBoard({ setGameStarted, isOfflineMode }) {
   }
   function classicMode(row, col) {
     //function to validate index
-    if (row == 0) return true;
+    if (row === "0") return true;
     else return rows[row - 1][col] !== "";
   }
 
@@ -116,7 +115,7 @@ function PlayBoard({ setGameStarted, isOfflineMode }) {
     }
     //Antidiagonal check
     for (let c = 0; c < GRID_WIDTH; c++) {
-      let hitsLD = 1;
+      hitsLD = 1;
       for (let row = 1; row < GRID_HEIGHT; row++) {
         if (
           rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] ===
