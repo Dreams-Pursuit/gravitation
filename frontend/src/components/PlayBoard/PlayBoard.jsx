@@ -109,7 +109,7 @@ function PlayBoard({ setGameStarted, isOfflineMode }) {
               rows[row][(row + c) % GRID_WIDTH]
             } won! Congratulations`
           );
-          setWinner(rows[row][(row + c) % GRID_WIDTH])
+          setWinner(rows[row][(row + c) % GRID_WIDTH]);
           return true;
         }
       }
@@ -118,30 +118,30 @@ function PlayBoard({ setGameStarted, isOfflineMode }) {
     for (let c = 0; c < GRID_WIDTH; c++) {
       let hitsLD = 1;
       for (let row = 1; row < GRID_HEIGHT; row++) {
-          if (
-              rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] ===
+        if (
+          rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] ===
               rows[row - 1][(GRID_WIDTH - row + c) % GRID_WIDTH] &&
               rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] !== ""
-          ) {
-              console.log(
-                  `left diagonal hit [${row},${(GRID_WIDTH - 1 - row + c) % GRID_WIDTH}] ${
-                  rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]
-                  }`
-              );
-              hitsLD++;
-          } else hitsLD = 1;
+        ) {
+          console.log(
+            `left diagonal hit [${row},${(GRID_WIDTH - 1 - row + c) % GRID_WIDTH}] ${
+              rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]
+            }`
+          );
+          hitsLD++;
+        } else hitsLD = 1;
 
-          if (hitsLD === 4) {
-              console.log(
-                  `The player ${
-                  rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]
-                  } won! Congratulations`
-              );
-              setWinner(rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]);
-              return true;
-          }
+        if (hitsLD === 4) {
+          console.log(
+            `The player ${
+              rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]
+            } won! Congratulations`
+          );
+          setWinner(rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]);
+          return true;
+        }
       }
-  }
+    }
     return false;
   }
 
@@ -175,19 +175,17 @@ function PlayBoard({ setGameStarted, isOfflineMode }) {
   }
   function generateGrid() {
     return rows.map((row, rowIndex) =>
-      row.map((cell, cellIndex) => {
-        return (
-          <div
-            key={"row-" + rowIndex + "_col-" + cellIndex}
-            data-row_index={rowIndex}
-            data-col_index={cellIndex}
-            className="board-cell"
-            onClick={cellHandler}
-          >
-            {cell}
-          </div>
-        );
-      })
+      row.map((cell, cellIndex) => (
+        <div
+          key={"row-" + rowIndex + "_col-" + cellIndex}
+          data-row_index={rowIndex}
+          data-col_index={cellIndex}
+          className="board-cell"
+          onClick={cellHandler}
+        >
+          {cell}
+        </div>
+      ))
     );
   }
 

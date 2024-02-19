@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import PlayBoard from './components/PlayBoard/PlayBoard';
-import StartScreen from './components/StartScreen/StartScreen';
-import './css/App.css';
+import PlayBoard from "./components/PlayBoard/PlayBoard";
+import StartScreen from "./components/StartScreen/StartScreen";
+import "./css/App.css";
 
 function App() {
   const [hasGameStarted, setGameStarted] = useState(false);
   const [offlineMode, setOfflineMode] = useState(false);
 
   useEffect(() => {
-    const chachedIfStarted = localStorage.getItem('hasGameStarted');
-    const chachedOfflineMode = localStorage.getItem('offlineMode');
+    const chachedIfStarted = localStorage.getItem("hasGameStarted");
+    const chachedOfflineMode = localStorage.getItem("offlineMode");
     if (chachedIfStarted) {
       setGameStarted(JSON.parse(chachedIfStarted));
     }
@@ -20,10 +20,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('hasGameStarted', hasGameStarted);
+    localStorage.setItem("hasGameStarted", hasGameStarted);
   }, [hasGameStarted]);
   useEffect(() => {
-    localStorage.setItem('offlineMode', offlineMode);
+    localStorage.setItem("offlineMode", offlineMode);
   }, [offlineMode]);
 
   return (
