@@ -1,10 +1,9 @@
 import React, { useState } from "react";
+import { GRID_HEIGHT, GRID_WIDTH } from "../../functions/constants";
 import "../../css/PlayBoard.css";
 
-const GRID_HEIGHT = 6;
-const GRID_WIDTH = 6;
 
-function PlayBoard() {
+function PlayBoard({ setGameStarted, isOfflineMode }) {
   const [rows, setRows] = React.useState(generateEmptyCellValues()); // Find a more efficient way
   const [currentPlayer, setCurrentPlayer] = React.useState("X");
   const [gameEnded, setGameEnded] = React.useState(false);
@@ -166,7 +165,8 @@ function PlayBoard() {
         setGameEnded(true);
       } else {
         setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
-        setTime(1000);
+        if (isOfflineMode) setTime(100000);
+        else setTime(1000);
       }
     }
     console.log("Clicked: [" + row + "," + col + "]");
@@ -216,6 +216,11 @@ function PlayBoard() {
     };
   }, [rows, hasGameStarted, time]);
 
+  function closeThePlayBoard() {
+    alert("You have given up, bruuhh! The winner is " + currentPlayer);
+    setGameStarted(false);
+  }
+
   const minutes = Math.floor((time % 360000) / 6000);
   const seconds = Math.floor((time % 6000) / 100);
   const milliseconds = time % 100;
@@ -228,6 +233,9 @@ function PlayBoard() {
           {seconds.toString().padStart(2, "0")}:
           {milliseconds.toString().padStart(2, "0")}
         </h3>
+      </div>
+      <div className="close-button">
+        <button onClick={closeThePlayBoard}>Give up</button>
       </div>
       <div>
         {gameEnded ? (
