@@ -1,11 +1,13 @@
-.setup-screen{
+.setup-component{
+    height: 100vh;
+    width: 100%;
+    background-color: azure;
+}
+.setup-menu{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100%;
-    background-color: azure;
 }
 .choose-mode{
     display: flex;
@@ -18,10 +20,6 @@
     padding:5px;
     font-size: 20px;
 }
-.timer{
-    display: flex;
-    flex-direction:column;
-}
 
 #timer-checkbox{
     display:flex;
@@ -32,8 +30,12 @@
 
 #timer-value{
     margin-bottom: 10px;
+    padding: 5px;
 }
-#timer-value #timer{
-    margin-left: 5px;
-    margin-right: 5px;
+#back-to-menu-button{
+    position: absolute;
+    top: 9px;
+    right: 0;
+    margin: 10px;
+    cursor: pointer;
 }
