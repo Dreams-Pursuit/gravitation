@@ -1,12 +1,11 @@
 // import React from "react";
 import "../../css/StartScreen.css";
 
-function StartScreen({ setGameSetup, setOfflineMode }) {
+function StartScreen({ setAppState }) {
 
   function onSetup(e) {
     e.preventDefault();
-    if (e.target.id === "offline-mode-btn") setOfflineMode(true);
-    setGameSetup(true);
+    setAppState("SetUp");
   }
 
   return (

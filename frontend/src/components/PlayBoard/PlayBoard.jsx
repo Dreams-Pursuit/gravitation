@@ -3,11 +3,11 @@ import { GRID_HEIGHT, GRID_WIDTH } from "../../functions/constants";
 import "../../css/PlayBoard.css";
 
 
-function PlayBoard({ hasGameStarted ,setGameStarted, isOfflineMode }) {
-  const [rows, setRows] = React.useState(generateEmptyCellValues()); // Find a more efficient way
-  const [currentPlayer, setCurrentPlayer] = React.useState("X");
-  const [gameEnded, setGameEnded] = React.useState(false);
-  const [time, setTime] = useState(1000);
+function PlayBoard({ setAppState, config }) {
+  const [gameStage, setGameStage] = useState("Paused");
+  const [rows, setRows] = useState(generateEmptyCellValues()); // Find a more efficient way
+  const [currentPlayer, setCurrentPlayer] = useState("X");
+  const [time, setTime] = useState(config.timerValue);
   const [winner, setWinner] = useState("");
 
   function generateEmptyCellValues() {
@@ -21,8 +21,8 @@ function PlayBoard({ hasGameStarted ,setGameStarted, isOfflineMode }) {
     e.preventDefault();
     setRows(generateEmptyCellValues());
     setCurrentPlayer("X");
-    setGameEnded(false);
-    setTime(1000);
+    setGameStage("Paused");
+    setTime(config.timerValue);
     document.querySelectorAll(".board-cell").forEach((cell) => {
       cell.innerHTML = "";
     });
@@ -145,7 +145,7 @@ function PlayBoard({ hasGameStarted ,setGameStarted, isOfflineMode }) {
     const row = cell.target.getAttribute("data-row_index");
     const col = cell.target.getAttribute("data-col_index");
 
-    if (!cell.target.innerHTML && !gameEnded) {
+    if (!cell.target.innerHTML && gameStage !== "Ended") {
       if (classicMode(row, col)) {
         cell.target.innerHTML = currentPlayer;
         rows[row][col] = currentPlayer;
@@ -155,13 +155,12 @@ function PlayBoard({ hasGameStarted ,setGameStarted, isOfflineMode }) {
         );
         return;
       }
-      if (!hasGameStarted) setHasGameStarted(true);
+      if (gameStage === "Paused") setGameStage("Running");
       if (isThereAWinner()) {
-        setGameEnded(true);
+        setGameStage("Ended");
       } else {
         setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
-        if (isOfflineMode) setTime(100000);
-        else setTime(1000);
+        setTime(config.timerValue);
       }
     }
     console.log("Clicked: [" + row + "," + col + "]");
@@ -190,28 +189,28 @@ function PlayBoard({ hasGameStarted ,setGameStarted, isOfflineMode }) {
       console.log("Entered");
       setRows(generateEmptyCellValues());
     }
-    if (hasGameStarted) {
+    if (gameStage === "Running") {
       if (time === 0) {
         setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
-        setTime(1000);
+        setTime(config.timerValue);
       }
       intervalId = setInterval(() => {
         setTime(time - 1);
       }, 10);
     }
 
-    if (gameEnded) {
+    if (gameStage === "Ended") {
       clearInterval(intervalId);
     }
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [rows, hasGameStarted, time]);
+  }, [rows, gameStage, time]);
 
   function closeThePlayBoard() {
     alert("You have given up, bruuhh! The winner is " + currentPlayer);
-    setGameStarted(false);
+    setAppState("MainMenu");
   }
 
   const minutes = Math.floor((time % 360000) / 6000);
@@ -231,7 +230,7 @@ function PlayBoard({ hasGameStarted ,setGameStarted, isOfflineMode }) {
         <button onClick={closeThePlayBoard}>Give up</button>
       </div>
       <div>
-        {gameEnded ? (
+        {gameStage === "Ended" ? (
           <h3>The winner - {winner}!</h3>
         ) : (
           <h3>Your turn: {currentPlayer}</h3>

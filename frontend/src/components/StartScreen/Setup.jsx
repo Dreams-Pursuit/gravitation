@@ -1,23 +1,31 @@
 import "../../css/Setup.css"
 
-function SetUp({setGameStarted, setGameSetup}){
-    function onStartOfflineModeButton(e) {
+function SetUp({ setAppState, setConfig}){
+    function onStartButton(e) {
         e.preventDefault();
         const gameMode = document.querySelector("input[name=\"mode\"]:checked").id;
         const firstPlayer = document.getElementById("player1Name").value;
         const secondPlayer = document.getElementById("player2Name").value;
-        if (e.target.id === "game-start-button")setGameStarted(true);
-        setGameSetup(false);
+        const timerValue = (Number.parseInt(document.getElementById("timer-minute").value) * 60 + Number.parseInt(document.getElementById("timer-second").value)) * 100;
+        console.log(timerValue);
+        if (e.target.id === "game-start-button"){
+            setConfig({
+                gameMode:gameMode,
+                firstPlayer:firstPlayer,
+                secondPlayer:secondPlayer,
+                timerValue: timerValue
+            })
+            setAppState("Game");
+        }
     }
     function goBackToMenu(e){
         e.preventDefault();
-        if(e.target.id === "back-to-menu-button")setGameSetup(false);
+        if(e.target.id === "back-to-menu-button")setAppState("MainMenu");
     }
 
     function onTimerCheck(e){
         var timerCheckbox = document.getElementById("timer");
         var timerFields = document.getElementById("timer-value");
-        console.log("Timer checked");
         timerFields.hidden = !timerCheckbox.checked;
     }
     function validateTimerInput(e){
@@ -61,7 +69,7 @@ function SetUp({setGameStarted, setGameSetup}){
                     <label>:</label>
                     <input type="text" id="timer-second" defaultValue="30" size="2" onBlur={validateTimerInput} required/>
                 </div>
-                <button id="game-start-button" onClick={onStartOfflineModeButton}>Start game</button>
+                <button id="game-start-button" onClick={onStartButton}>Start game</button>
             </div>
         </div>
     );

@@ -6,53 +6,46 @@ import StartScreen from "./components/StartScreen/StartScreen";
 import "./css/App.css";
 
 function App() {
-  const [hasGameStarted, setGameStarted] = useState(false);
-  const [gameSetup, setGameSetup] = useState(false);
-  const [offlineMode, setOfflineMode] = useState(false);
-
-  useEffect(() => {
-    const chachedIfStarted = localStorage.getItem("hasGameStarted");
-    const chachedOfflineMode = localStorage.getItem("offlineMode");
-    const chachedGameSetup = localStorage.getItem("gameSetup");
-    if (chachedGameSetup) {
-      setGameSetup(JSON.parse(chachedGameSetup));
+  const [config, setConfig] = useState(null);
+  const [currentState, setCurrentState] = useState("MainMenu");       //For now, there are 3 states                  
+  useEffect(() => {                                                   //for currentState : 
+    const cachedCurrentState = localStorage.getItem("currentState");  //1. MainMenu
+    const cachedChosenMode = localStorage.getItem("chosenMode");      //2. SetUp
+    const cachedConfig = localStorage.getItem("config");              //3. Game
+    if (cachedCurrentState) {                      
+      setCurrentState(cachedCurrentState);
     }
-    if (chachedIfStarted) {
-      setGameStarted(JSON.parse(chachedIfStarted));
-    }
-    if (chachedOfflineMode) {
-      setOfflineMode(JSON.parse(chachedOfflineMode));
+    if(cachedConfig){
+      setConfig(cachedConfig);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("hasGameStarted", hasGameStarted);
-  }, [hasGameStarted]);
+    localStorage.setItem("currentStage", currentState);
+  }, [currentState]);
   useEffect(() => {
-    localStorage.setItem("offlineMode", offlineMode);
-  }, [offlineMode]);
-  useEffect(() => {
-    localStorage.setItem("gameSetup", gameSetup);
-  }, [gameSetup]);
-
-  if(gameSetup)
-    return (
-      <div className="App">
-        <SetUp setGameStarted={setGameStarted} setGameSetup={setGameSetup}/>
-      </div>
-    );
-  else if(hasGameStarted)
-    return (
-      <div className="App">
-        <PlayBoard hasGameStarted={hasGameStarted} setGameStarted={setGameStarted} isOfflineMode={offlineMode}/>
-      </div>
-    );
-  else
-    return (
-      <div className="App">
-        <StartScreen setGameSetup={setGameSetup} setOfflineMode={setOfflineMode}/>
-      </div>
-    );
+    localStorage.setItem("config", config);
+  },[config]);
+  switch(currentState){
+    case "SetUp":
+      return (
+        <div className="App">
+          <SetUp setAppState={setCurrentState} setConfig={setConfig}/>
+        </div>
+      );
+    case "Game":
+      return (
+        <div className="App">
+          <PlayBoard setAppState={setCurrentState} config={config}/>
+        </div>
+      );
+    case "MainMenu":
+      return (
+        <div className="App">
+          <StartScreen setAppState={setCurrentState}/>
+        </div>
+      );
+  }
 }
 
 export default App;
