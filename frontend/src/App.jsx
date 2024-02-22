@@ -9,19 +9,19 @@ function App() {
   const [config, setConfig] = useState(null);
   const [currentState, setCurrentState] = useState("MainMenu");       //For now, there are 3 states                  
   useEffect(() => {                                                   //for currentState : 
-    const cachedCurrentState = localStorage.getItem("currentState");  //1. MainMenu
-    const cachedChosenMode = localStorage.getItem("chosenMode");      //2. SetUp
-    const cachedConfig = localStorage.getItem("config");              //3. Game
-    if (cachedCurrentState) {                      
+    const cachedCurrentState = localStorage.getItem("currentState");  //1. MainMenu     
+    const cachedConfig = localStorage.getItem("config");              //2. SetUp
+    if (cachedCurrentState) {                                         //3. Game
       setCurrentState(cachedCurrentState);
     }
+    console.log(currentState)
     if(cachedConfig){
       setConfig(cachedConfig);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("currentStage", currentState);
+    localStorage.setItem("currentState", currentState);
   }, [currentState]);
   useEffect(() => {
     localStorage.setItem("config", config);

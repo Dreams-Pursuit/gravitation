@@ -6,14 +6,13 @@ function SetUp({ setAppState, setConfig}){
         const gameMode = document.querySelector("input[name=\"mode\"]:checked").id;
         const firstPlayer = document.getElementById("player1Name").value;
         const secondPlayer = document.getElementById("player2Name").value;
-        const timerValue = (Number.parseInt(document.getElementById("timer-minute").value) * 60 + Number.parseInt(document.getElementById("timer-second").value)) * 100;
-        console.log(timerValue);
+        const timerValue = !document.getElementById("timer-value").hidden ? (Number.parseInt(document.getElementById("timer-minute").value) * 60 + Number.parseInt(document.getElementById("timer-second").value)) * 100 : 0;
         if (e.target.id === "game-start-button"){
             setConfig({
                 gameMode:gameMode,
                 firstPlayer:firstPlayer,
                 secondPlayer:secondPlayer,
-                timerValue: timerValue
+                timerValue:timerValue
             })
             setAppState("Game");
         }
