@@ -1,7 +1,9 @@
 "use strict";
 
-const core = async (fastify, _, done) => {
+const game = async (fastify, _, done) => {
   fastify.get("/", async (req, reply) => ({ hello: "world" }));
 
   done();
 };
+
+module.exports = game;
