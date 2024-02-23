@@ -5,15 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node --watch-path=./src ./src/server.js",
+    "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.ts\"",
+    "fmt": "prettier --write \"**/*.js\" \"**/*.ts\"",
+    "test": "node --test \"./src/tests/*.test.js\" \"**/*.spec.js\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@fastify/websocket": "^9.0.0",
     "fastify": "^4.26.1",
-    "pg": "^8.11.3",
-    "uuid": "^9.0.1"
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "eslint": "^8.56.0",
