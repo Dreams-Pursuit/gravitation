@@ -1,6 +1,7 @@
 "use strict";
 
-const game = async (fastify, _, done) => {
+const game = async (fastify, options, done) => {
+  const { createUUID } = options;
 
   function broadcast(message) {
     for (const client of fastify.websocketServer.clients) {
