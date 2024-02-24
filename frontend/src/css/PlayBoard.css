@@ -15,6 +15,16 @@
     width: 100%;
     background-color: azure;
 }
+.interface-wrapper{
+    display:flex;
+    flex-direction: row;
+    width:100%;
+}
+.player{
+    width: 30%;
+    height: 20%;
+    padding-top: 10px;
+}
 
 .board-field {
     display: grid;

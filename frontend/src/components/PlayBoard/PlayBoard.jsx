@@ -1,4 +1,4 @@
-import { useEffect ,useState } from "react";
+import { useEffect, useState } from "react";
 import { GRID_HEIGHT, GRID_WIDTH } from "../../functions/constants";
 import "../../css/PlayBoard.css";
 
@@ -19,11 +19,11 @@ function PlayBoard({ setAppState, config }) {
     return rows;
   }
 
-  function getRandomPlayer(obj){
-      obj[config.firstPlayer] = (randomPlayerValue < 0.5 ? "X" : "O");
-      obj.X = (randomPlayerValue < 0.5 ? config.firstPlayer : config.secondPlayer);
-      obj[config.secondPlayer] = (randomPlayerValue < 0.5 ?  "O" : "X");
-      obj.O = (randomPlayerValue < 0.5 ? config.secondPlayer : config.firstPlayer);
+  function getRandomPlayer(obj) {
+    obj[config.firstPlayer] = randomPlayerValue < 0.5 ? "X" : "O";
+    obj.X = randomPlayerValue < 0.5 ? config.firstPlayer : config.secondPlayer;
+    obj[config.secondPlayer] = randomPlayerValue < 0.5 ? "O" : "X";
+    obj.O = randomPlayerValue < 0.5 ? config.secondPlayer : config.firstPlayer;
   }
 
   function resetHandler(e) {
@@ -47,10 +47,20 @@ function PlayBoard({ setAppState, config }) {
       //The function is used for the "Advanced mode"
       for (let j = 0; j < GRID_WIDTH; j++) {
         //where you can put cross(X) or null(O) whereever you want
-        if ((i != row || j != col) && rows[i - 1][j] === "" && rows[i][j] !== ""){
+        if (
+          (i != row || j != col) &&
+          rows[i - 1][j] === "" &&
+          rows[i][j] !== ""
+        ) {
           //However in this case it will fall in case it has nothing
           [rows[i][j], rows[i - 1][j]] = [rows[i - 1][j], rows[i][j]]; //under it.
-          [document.getElementById("row-" + (i - 1) + "_col-" + j).innerHTML , document.getElementById("row-" + i + "_col-" + j).innerHTML] = [document.getElementById("row-" + i + "_col-" + j).innerHTML, document.getElementById("row-" + (i - 1) + "_col-" + j).innerHTML];
+          [
+            document.getElementById("row-" + (i - 1) + "_col-" + j).innerHTML,
+            document.getElementById("row-" + i + "_col-" + j).innerHTML,
+          ] = [
+            document.getElementById("row-" + i + "_col-" + j).innerHTML,
+            document.getElementById("row-" + (i - 1) + "_col-" + j).innerHTML,
+          ];
         }
       }
     }
@@ -115,8 +125,8 @@ function PlayBoard({ setAppState, config }) {
       for (let row = 1; row < GRID_HEIGHT; row++) {
         if (
           rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] ===
-              rows[row - 1][(GRID_WIDTH - row + c) % GRID_WIDTH] &&
-              rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] !== ""
+            rows[row - 1][(GRID_WIDTH - row + c) % GRID_WIDTH] &&
+          rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] !== ""
         ) {
           hitsLD++;
         } else hitsLD = 1;
@@ -136,15 +146,18 @@ function PlayBoard({ setAppState, config }) {
     const col = cell.target.getAttribute("data-col_index");
 
     if (!cell.target.innerHTML && gameStage !== "Ended") {
-      if (config.gameMode === "classic" && classicMode(row, col) || config.gameMode === "advanced") {
+      if (
+        (config.gameMode === "classic" && classicMode(row, col)) ||
+        config.gameMode === "advanced"
+      ) {
         cell.target.innerHTML = playerSymbols[currentPlayer];
         rows[row][col] = playerSymbols[currentPlayer];
-        if(config.gameMode === "advanced"){
-          advancedMode(row,col);
+        if (config.gameMode === "advanced") {
+          advancedMode(row, col);
         }
-      } else{
+      } else {
         console.log(
-          `Impossoble to put ${currentPlayer} here - not a based field!`
+          `Impossoble to put ${currentPlayer} here - not a based field!`,
         );
         return;
       }
@@ -152,7 +165,11 @@ function PlayBoard({ setAppState, config }) {
       if (isThereAWinner()) {
         setGameStage("Ended");
       } else {
-        setCurrentPlayer(currentPlayer === config.firstPlayer ? config.secondPlayer : config.firstPlayer);
+        setCurrentPlayer(
+          currentPlayer === config.firstPlayer
+            ? config.secondPlayer
+            : config.firstPlayer,
+        );
         setTime(config.timerValue);
       }
     }
@@ -170,7 +187,7 @@ function PlayBoard({ setAppState, config }) {
         >
           {cell}
         </div>
-      ))
+      )),
     );
   }
 
@@ -182,7 +199,11 @@ function PlayBoard({ setAppState, config }) {
     }
     if (gameStage === "Running" && config.timerValue !== 0) {
       if (time === 0) {
-        setCurrentPlayer(currentPlayer === config.firstPlayer ? config.secondPlayer : config.firstPlayer);
+        setCurrentPlayer(
+          currentPlayer === config.firstPlayer
+            ? config.secondPlayer
+            : config.firstPlayer,
+        );
         setTime(config.timerValue);
       }
       intervalId = setInterval(() => {
@@ -212,9 +233,11 @@ function PlayBoard({ setAppState, config }) {
     <div className="playboard-component">
       <div className="time-elapsed-stat">
         <h3>
-          {config.timerValue !== 0 ? (`Time left: ${minutes.toString().padStart(2, "0")}:
+          {config.timerValue !== 0
+            ? `Time left: ${minutes.toString().padStart(2, "0")}:
           ${seconds.toString().padStart(2, "0")}:
-          ${milliseconds.toString().padStart(2, "0")}`) : null}
+          ${milliseconds.toString().padStart(2, "0")}`
+            : null}
         </h3>
       </div>
       <div className="close-button">
@@ -224,16 +247,22 @@ function PlayBoard({ setAppState, config }) {
         {gameStage === "Ended" ? (
           <h3>The winner - {playerSymbols[winner]}!</h3>
         ) : (
-          <h3>Your turn: {currentPlayer}({playerSymbols[currentPlayer]})</h3>
+          <h3>
+            Your turn: {currentPlayer}({playerSymbols[currentPlayer]})
+          </h3>
         )}
       </div>
       <div className="interface-wrapper">
-        <div className="board-field">{generateGrid().reverse()}</div>
-        <div className="board-control">
-          <div className="buttons-wrapper">
-            <button onClick={resetHandler}>Reset</button>
+        <div className="player">{config.firstPlayer}</div>
+        <div>
+          <div className="board-field">{generateGrid().reverse()}</div>
+          <div className="board-control">
+            <div className="buttons-wrapper">
+              <button onClick={resetHandler}>Reset</button>
+            </div>
           </div>
         </div>
+        <div className="player">{config.secondPlayer}</div>
       </div>
     </div>
   );
