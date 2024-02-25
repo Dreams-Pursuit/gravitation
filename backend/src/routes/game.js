@@ -37,7 +37,6 @@ const game = async (fastify, options, done) => {
       }
     });
   });
-
   done();
 };
 

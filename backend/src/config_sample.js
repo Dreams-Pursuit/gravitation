@@ -10,8 +10,8 @@ module.exports = {
     password: "admin",
   },
   pg: {
-    database: "postgres",
+    database: "Gravitation",
     user: "postgres",
-    password: "postgres",
+    password: "yuraTop4ik2004",
   }
 };

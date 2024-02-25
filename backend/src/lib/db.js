@@ -1,18 +1,34 @@
 "use strict";
 
-const pg = require("pg");
 
-const crud = (pool) => (table) => ({
+const buildContraint = (option) =>{
+  if(!option?.data)
+    return "";
+  const conds = [];
+  for(let [key,value] of [...Object.entries(option.data)]){
+    conds.push(key + "=" + "\'" + value + "\'");
+  }
+  if(!option?.logic)
+    return "WHERE " + conds[0];
+  return "WHERE " + conds.join(` ${option.logic} `);
+}
+
+const crud = (table) => ({
+  getDB(){
+    const app = require("../server.js");
+    return app.pg;
+  },
   async query(sql, args) {
-    const result = await pool.query(sql, args);
+    const result = await this.getDB().query(sql, args);
     return result.rows;
   },
 
-  async read(id, fields = ["*"]) {
+  async read(options, fields = ["*"]) {
     const names = fields.join(", ");
     const sql = `SELECT ${names} FROM ${table}`;
-    if (!id) return pool.query(sql);
-    return pool.query(`${sql} WHERE id = $1`, [id]);
+    if (!options) return this.getDB().query(sql);
+    //console.log(`${sql} ${buildContraint(options)}`);
+    return this.getDB().query(`${sql} ${buildContraint(options)}`);
   },
 
   async create({ ...record }) {
@@ -27,7 +43,7 @@ const crud = (pool) => (table) => ({
     const fields = "\"" + keys.join("\", \"") + "\"";
     const params = nums.join(", ");
     const sql = `INSERT INTO "${table}" (${fields}) VALUES (${params})`;
-    return pool.query(sql, data);
+    return this.getDB().query(sql, data);
   },
 
   async update(id, { ...record }) {
@@ -42,13 +58,13 @@ const crud = (pool) => (table) => ({
     const delta = updates.join(", ");
     const sql = `UPDATE ${table} SET ${delta} WHERE id = $${++i}`;
     data.push(id);
-    return pool.query(sql, data);
+    return this.getDB().query(sql, data);
   },
 
   async delete(id) {
     const sql = "DELETE FROM ${table} WHERE id = $1";
-    return pool.query(sql, [id]);
+    return this.getDB().query(sql, [id]);
   },
 });
 
-module.exports = (options) => crud(new pg.Pool(options));
+module.exports = crud;
