@@ -2,29 +2,31 @@
 const crud = require("./db.js");
 const playerTable = crud("players");
 
-function userExists(email, name) {
-  const response = playerTable.read({
+async function userExists(email, name) {
+  const response = await playerTable.read({
         data:{
             user_email:email,
             user_name:name
         },
         logic:"OR"
     });
-  if(response.length !== 0){
-    return true;
-  }
-  else{
-    return false;
-  }
+  return response.rows.length !== 0;
 }
 
-function addUser(email, name, password) {
-  return new Promise(() => {
-    playerTable.create({
+async function addUser(email, name, password) {
+  await playerTable.create({
         user_email:email,
         user_name:name,
         user_password:password
-    })
   });
 }
-module.exports = { addUser, userExists };
+
+async function getPasswordByEmail(email){
+  const response = await playerTable.read({
+    data:{
+      user_email:email
+    }
+  });
+  return response.rows;
+}
+module.exports = { addUser, userExists, getPasswordByEmail };

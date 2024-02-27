@@ -1,5 +1,6 @@
 "use strict";
 
+let dbInstance = null;
 
 const buildContraint = (option) =>{
   if(!option?.data)
@@ -15,8 +16,11 @@ const buildContraint = (option) =>{
 
 const crud = (table) => ({
   getDB(){
-    const app = require("../server.js");
-    return app.pg;
+    if(!dbInstance){
+      const app = require("../server.js");
+      dbInstance = app.pg;
+    }
+    return dbInstance;
   },
   async query(sql, args) {
     const result = await this.getDB().query(sql, args);

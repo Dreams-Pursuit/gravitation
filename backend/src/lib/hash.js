@@ -8,7 +8,8 @@ const SCRYPT_PREFIX = "$scrypt$N=32768,r=8,p=1,maxmem=67108864$";
 const serializeHash = (hash, salt) => {
   const saltString = salt.toString("base64").split("=")[0];
   const hashString = hash.toString("base64").split("=")[0];
-  return `${SCRYPT_PREFIX}${saltString}${hashString}`;
+  console.log(saltString,hashString);
+  return `${SCRYPT_PREFIX}${saltString}$${hashString}`;
 };
 
 const parseOptions = (options) => {
@@ -23,6 +24,7 @@ const parseOptions = (options) => {
 
 const deserializeHash = (phcString) => {
   const [, name, options, salt64, hash64] = phcString.split("$");
+  console.log(name, options, salt64, hash64)
   if (name !== "scrypt") {
     throw new Error("Node.js crypto module only supports scrypt, fool!");
   }
