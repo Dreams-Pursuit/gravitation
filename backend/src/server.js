@@ -1,11 +1,11 @@
 "use strict";
 const { build } = require("./app");
 
-const app = build({ logger: true });
-
 const OPTIONS = {
   port: 3000,
 };
+
+const app = build({ logger: true });
 
 app.listen(OPTIONS, (err, address) => {
   if (err) {

@@ -37,8 +37,8 @@ function winnerAlgo(rows) {
     for (let row = 1; row < GRID_HEIGHT; row++) {
       if (
         rows[row][(row + c) % GRID_WIDTH] ===
-            rows[row - 1][((row + c) % GRID_WIDTH) - 1] &&
-          rows[row][(row + c) % GRID_WIDTH] !== ""
+          rows[row - 1][((row + c) % GRID_WIDTH) - 1] &&
+        rows[row][(row + c) % GRID_WIDTH] !== ""
       ) {
         hitsRD++;
       } else hitsRD = 1;
@@ -54,8 +54,8 @@ function winnerAlgo(rows) {
     for (let row = 1; row < GRID_HEIGHT; row++) {
       if (
         rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] ===
-              rows[row - 1][(GRID_WIDTH - row + c) % GRID_WIDTH] &&
-              rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] !== ""
+          rows[row - 1][(GRID_WIDTH - row + c) % GRID_WIDTH] &&
+        rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] !== ""
       ) {
         hitsLD++;
       } else hitsLD = 1;

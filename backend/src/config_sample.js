@@ -13,5 +13,5 @@ module.exports = {
     database: "Gravitation",
     user: "postgres",
     password: "yuraTop4ik2004",
-  }
+  },
 };
