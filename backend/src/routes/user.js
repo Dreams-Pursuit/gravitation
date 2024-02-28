@@ -1,6 +1,6 @@
 "use strict"
-const {userExists, addUser, getPasswordByEmail} = require("../lib/databaseOperator.js");
-const {hashPassword, validatePassword} = require("../lib/hash.js");
+const { databaseOperator } = require("../lib/databaseOperator.js");
+const { hashPassword, validatePassword } = require("../lib/hash.js");
 
 const user = async(fastify, options, done) => {
     const {createUUID} = options;
@@ -14,12 +14,12 @@ const user = async(fastify, options, done) => {
             reply.code(400).send({message:"Bad credentials!"});
             return;
         }
-        if(await userExists(data.email,data.username)){
+        if(await databaseOperator.userExists(data.email,data.username)){
             reply.code(400).send({message: "This username and(or) email has already been used"});
             return;
         }
         const codedPassword = await hashPassword(data.password);
-        await addUser(data.email, data.username, codedPassword);
+        await databaseOperator.addUser(data.email, data.username, codedPassword);
         reply.code(200).send({message: "The account has been successfully created!"});
     });
     fastify.post("/login", async (request, reply) => {
@@ -28,7 +28,7 @@ const user = async(fastify, options, done) => {
             reply.code(400).send({message: "Bad format of credentials"});
             return;
         }
-        const credentials = await getPasswordByEmail(data.email);
+        const credentials = await databaseOperator.getPasswordByEmail(data.email);
         console.log(credentials);
         if(credentials.length === 0){
             reply.code(400).send({message: "Account with this email does not exist!"});
@@ -39,6 +39,24 @@ const user = async(fastify, options, done) => {
         }else{
             reply.code(400).send({message: "Failed to login, maybe wrong credentials!"});
         }
+    })
+    fastify.get("/:userName", async (request, reply) =>{
+        const { userName } = request.params;
+        if(!regexp.test(userName)){
+            reply.code(400).send({message: "Wrong format of user id!"});
+            return;
+        }
+        const user = await databaseOperator.userNameExists(userName);
+        if(user.length === 0){
+            reply.code(400).send({message: "This username does not exist!"});
+            return;
+        }
+        console.log(user);
+        reply.code(200).send({
+            username: user[0].user_name,
+            userRating: user[0].user_rating,
+            userFriends: user[0].user_friends
+        })
     })
     done();
 }

@@ -1,5 +1,4 @@
 "use strict";
-const fastify = require("fastify");
 const { build } = require("./app");
 
 const app = build({ logger: true });
