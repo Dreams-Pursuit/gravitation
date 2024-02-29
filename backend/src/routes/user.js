@@ -1,6 +1,7 @@
 "use strict"
 const { databaseOperator } = require("../lib/databaseOperator.js");
 const { hashPassword, validatePassword } = require("../lib/hash.js");
+const { generateToken, validateToken } = require("../lib/token.js");
 
 const user = async(fastify, options, done) => {
     const {createUUID} = options;
@@ -20,7 +21,8 @@ const user = async(fastify, options, done) => {
         }
         const codedPassword = await hashPassword(data.password);
         await databaseOperator.addUser(data.email, data.username, codedPassword);
-        reply.code(200).send({message: "The account has been successfully created!"});
+        const token = generateToken({username:data.username});
+        reply.code(200).send({message: "The account has been successfully created!", token:token});
     });
     fastify.post("/login", async (request, reply) => {
         const data = request.body;
@@ -40,9 +42,10 @@ const user = async(fastify, options, done) => {
             reply.code(400).send({message: "Failed to login, maybe wrong credentials!"});
         }
     })
-    fastify.get("/:userName", async (request, reply) =>{
+    fastify.post("/:userName", async (request, reply) =>{
         const { userName } = request.params;
-        if(!regexp.test(userName)){
+        const data = request.body;
+        if(!data?.token || !regexp.test(userName)){
             reply.code(400).send({message: "Wrong format of user id!"});
             return;
         }
@@ -52,6 +55,16 @@ const user = async(fastify, options, done) => {
             return;
         }
         console.log(user);
+        switch(validateToken(data.token)){
+            case 0:
+                reply.code(400).send({message:"Your token has expired, please log in once more to obtain a new one!"});
+                return;
+            case -1:
+                reply.code(400).send({message: "Wrong token, access denied!"});
+                return;
+            default:
+                break;
+        }
         reply.code(200).send({
             username: user[0].user_name,
             userRating: user[0].user_rating,
