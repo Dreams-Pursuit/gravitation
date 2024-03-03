@@ -3,6 +3,29 @@
 const GRID_HEIGHT = 6;
 const GRID_WIDTH = 6;
 
+
+function advancedMode(rows,row, col) {
+  for (let i = 1; i < GRID_HEIGHT; i++) {
+    //The function is used for the "Advanced mode"
+    for (let j = 0; j < GRID_WIDTH; j++) {
+      //where you can put cross(X) or null(O) whereever you want
+      if (
+        (i != row || j != col) &&
+        rows[i - 1][j] === "" &&
+        rows[i][j] !== ""
+      ) {
+        //However in this case it will fall in case it has nothing
+        [rows[i][j], rows[i - 1][j]] = [rows[i - 1][j], rows[i][j]]; //under it.
+      }
+    }
+  }
+  return rows;
+}
+function classicMode(row, col) {
+  //function to validate index
+  return row === "0" || rows[row - 1][col] !== "";
+}
+
 function winnerAlgo(rows) {
   //Horizontal matching check
   for (let row = 0; row < GRID_HEIGHT; row++) {
@@ -68,4 +91,4 @@ function winnerAlgo(rows) {
   return { winner: false };
 }
 
-module.exports = winnerAlgo;
+module.exports = {winnerAlgo, advancedMode};

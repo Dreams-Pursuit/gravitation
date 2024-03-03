@@ -19,12 +19,6 @@ function PlayBoard({ setAppState, config }) {
     return rows;
   }
 
-  function getRandomPlayer(obj) {
-    obj[config.firstPlayer] = randomPlayerValue < 0.5 ? "X" : "O";
-    obj.X = randomPlayerValue < 0.5 ? config.firstPlayer : config.secondPlayer;
-    obj[config.secondPlayer] = randomPlayerValue < 0.5 ? "O" : "X";
-    obj.O = randomPlayerValue < 0.5 ? config.secondPlayer : config.firstPlayer;
-  }
 
   function resetHandler(e) {
     e.preventDefault();
@@ -41,35 +35,7 @@ function PlayBoard({ setAppState, config }) {
     });
   }
 
-  function advancedMode(row, col) {
-    console.log(rows);
-    for (let i = 1; i < GRID_HEIGHT; i++) {
-      //The function is used for the "Advanced mode"
-      for (let j = 0; j < GRID_WIDTH; j++) {
-        //where you can put cross(X) or null(O) whereever you want
-        if (
-          (i != row || j != col) &&
-          rows[i - 1][j] === "" &&
-          rows[i][j] !== ""
-        ) {
-          //However in this case it will fall in case it has nothing
-          [rows[i][j], rows[i - 1][j]] = [rows[i - 1][j], rows[i][j]]; //under it.
-          [
-            document.getElementById("row-" + (i - 1) + "_col-" + j).innerHTML,
-            document.getElementById("row-" + i + "_col-" + j).innerHTML,
-          ] = [
-            document.getElementById("row-" + i + "_col-" + j).innerHTML,
-            document.getElementById("row-" + (i - 1) + "_col-" + j).innerHTML,
-          ];
-        }
-      }
-    }
-    return rows;
-  }
-  function classicMode(row, col) {
-    //function to validate index
-    return row === "0" || rows[row - 1][col] !== "";
-  }
+  
 
   function isThereAWinner() {
     //Horizontal matching check
