@@ -21,6 +21,7 @@ class gameQueue
                 this.startGame(firstPlayer, secondPlayer);
             }else{
                 console.log("Queue is empty :(");
+                console.log(this.gamesMap);
             }
         }, 5000);
         console.log("The queue started");
@@ -28,10 +29,10 @@ class gameQueue
     endQueue()
     {
         clearInterval(this.interval);
-    }
+    };
     startGame(frst, scnd){
         const board = new Array(6).fill(0).map(elem => new Array(6).fill(""));
-        const randomPlayer = (Math.random() * Date.now()) % 2;
+        const randomPlayer = Math.floor(Math.random() * Date.now()) % 2;
         const tempGame = {
             players: [frst, scnd],
             symbols: ["X", "O"],
@@ -41,7 +42,7 @@ class gameQueue
         this.gamesMap.set(frst, tempGame);
         this.gamesMap.set(scnd, tempGame);
         console.log("New game has been successfully added!");
-    }
+    };
 }
 
 module.exports = gameQueue;

@@ -23,44 +23,50 @@ const game = async (fastify, options, done) => {
     connection.socket.on("message", (message) => {
       const data = JSON.parse(message);
       if(!data?.type || !data?.username){
-        client.send({message: "Oops! Something's wrong with the message"});
+        connection.socket.send("Oops! Something's wrong with the message");
         return;
       }
       if (data.type === "join") {
         if (games.has(data.username)) {
-          client.send({message: "Can't connect one player to two games"});
+          connection.socket.send("Can't connect one player to two games");
           return;
         } else {
+          if(queue.queue.includes(data.username)){
+            connection.socket.send("You can't connect to the game twice");
+            return;
+          }
           queue.joinQueue(data.username);
         }
       }
       if (data.type === "move") {
         if(!games.has(data.username)){
-          client.send({message: "This game does not exist", isValidMove: false});
+          connection.socket.send("This game does not exist");
           return;
         }
         if(!data?.move){
-          client.send({message: "Seems like you forgot to make your turn", isValidMove: false});
+          connection.socket.send(JSON.stringify({message: "Seems like you forgot to make your turn", isValidMove: false}));
           return;
         }
         const temp = games.get(data.username);
-        if(data.username !== temp.players[temp.turn] || data.move[0] < 0 || data.move[0] >= 6 || data.move[1] < 0 || data.move[1] >= 6){
-          client.send({message: "Wait, something's wrong with the turn", isValidMove: false});
+        if(data.username !== temp.players[temp.turn] || data.move[0] < 0 || data.move[0] >= 6 || data.move[1] < 0 || data.move[1] >= 6 || temp.board[data.move[0]][data.move[1]] != ""){
+          connection.socket.send(JSON.stringify({message: "Wait, something's wrong with the turn", isValidMove: false}));
           return;
         }
         temp.board[data.move[0]][data.move[1]] = temp.symbols[temp.turn];
-        const winnerSymbol = winnerAlgo(temp.board).winner;
         advancedMode(temp.board, data.move[0], data.move[1]);
+        console.log(temp.board);
+        const winnerSymbol = winnerAlgo(temp.board).winner;
         if(winnerSymbol){
           const winner = temp.symbols.indexOf(winnerSymbol);
           // Here will be some query to write rhe result to database
           games.delete(temp.firstPlayer);
           games.delete(temp.secondPlayer);
-          client.send({message: `Player ${winner} won!`, winner: winner});
+          connection.socket.send(JSON.stringify({message: `Player ${winner} won!`, winner: winner}));
+          console.log(games);
           return;
         }
-        temp.turn = (temp.turn) % 2;
-        client.send({message:"The move has been successfully added",isValidMove: true});
+        temp.turn = (temp.turn + 1) % 2;
+        connection.socket.send(JSON.stringify({message:"The move has been successfully added",isValidMove: true}));
         return;
       }
     });
