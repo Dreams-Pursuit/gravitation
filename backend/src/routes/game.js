@@ -30,13 +30,8 @@ const game = async (fastify, options, done) => {
         if (games.has(data.username)) {
           connection.socket.send("Can't connect one player to two games");
           return;
-        } else {
-          if(queue.queue.includes(data.username)){
-            connection.socket.send("You can't connect to the game twice");
-            return;
-          }
-          queue.joinQueue(data.username);
         }
+        queue.joinQueue(data.username);
       }
       if (data.type === "move") {
         if(!games.has(data.username)){
@@ -59,8 +54,8 @@ const game = async (fastify, options, done) => {
         if(winnerSymbol){
           const winner = temp.symbols.indexOf(winnerSymbol);
           // Here will be some query to write rhe result to database
-          games.delete(temp.firstPlayer);
-          games.delete(temp.secondPlayer);
+          games.delete(temp.players[0]);
+          games.delete(temp.players[1]);
           connection.socket.send(JSON.stringify({message: `Player ${winner} won!`, winner: winner}));
           console.log(games);
           return;

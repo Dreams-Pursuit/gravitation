@@ -1,23 +1,64 @@
 "use strict"
 
+function ListNode(val, next){
+    this.val = (val === undefined ? null : val);
+    this.next = (next === undefined ? null : next);
+}
+
 class gameQueue
 {
     constructor(){
-        this.queue = [];
+        this.head = null;
+        this.tail = null;
+        this.presence = {};
+        this.queueLength = 0;
         this.gamesMap = new Map();
         this.interval = null;
     };
     joinQueue(username){
-        this.queue.push(username);
-        console.log(`Player ${username} has successfully joined the queue!`);
+        if(typeof username !== 'string'){
+            console.log("Invalid username");
+            return;
+        }
+        if(this.presence.hasOwnProperty(username)){
+            console.log("Failed to join the queue - this user is already in the queue");
+            return;
+        }
+        this.presence[username] = true;
+        let temp = new ListNode(username);
+        if(this.head == null){
+            this.head = temp;
+            this.tail = temp;
+        }else{
+            this.tail.next = temp;
+            this.tail = temp;
+        }
+        this.queueLength++;
     };
+    popQueue(){
+        if(this.head == null){
+            return null;
+        }
+        let temp = this.head;
+        if(this.head == this.tail){
+            this.head = null;
+            this.tail = null;
+        }else{
+            let curr = this.head.next;
+            temp.next = null;
+            this.head = curr;
+        }
+        delete this.presence[temp.val];
+        this.queueLength--;
+        return temp.val;
+    }
     startQueue()
     {
         this.interval = setInterval(() => {
-            if(this.queue.length >= 2){
+            if(this.queueLength >= 2){
                 console.log("Creating a new game!");
-                const firstPlayer = this.queue.shift();
-                const secondPlayer = this.queue.shift();
+                const firstPlayer = this.popQueue();
+                const secondPlayer = this.popQueue();
                 this.startGame(firstPlayer, secondPlayer);
             }else{
                 console.log("Queue is empty :(");
