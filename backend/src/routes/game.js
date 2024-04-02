@@ -1,13 +1,9 @@
 "use strict";
-const {winnerAlgo, advancedMode} = require("../utils/gameLogic.js");
-const gameQueue = require("../utils/gameQueue.js");
+const gameManager = require('../utils/gameManager.js');
 
-const queue = new gameQueue();
-      
 const game = async (fastify, options, done) => {
   const { createUUID } = options;
-  queue.startQueue();
-  const games = queue.gamesMap;
+  gameManager.startProcessing();
   function broadcast(message) {
     for (const client of fastify.websocketServer.clients) {
       client.send(JSON.stringify(message));
@@ -22,47 +18,33 @@ const game = async (fastify, options, done) => {
 
     connection.socket.on("message", (message) => {
       const data = JSON.parse(message);
-      if(!data?.type || !data?.username){
+      console.log(data);
+      if(!data?.type)
+      {
         connection.socket.send("Oops! Something's wrong with the message");
         return;
       }
       if (data.type === "join") {
-        if (games.has(data.username)) {
-          connection.socket.send("Can't connect one player to two games");
-          return;
+        if(!data?.username)
+        {
+          connection.socket.send("Something went wrong!");
         }
-        queue.joinQueue(data.username);
+        gameManager.gameQueue.joinQueue(data.username);
       }
-      if (data.type === "move") {
-        if(!games.has(data.username)){
-          connection.socket.send("This game does not exist");
+      if (data.type === "move")
+      {
+        if(!data?.move || !data?.username)
+        {
+          connection.socket.send(JSON.stringify({message: "Invalid data format", isValidMove: false}));
           return;
         }
-        if(!data?.move){
-          connection.socket.send(JSON.stringify({message: "Seems like you forgot to make your turn", isValidMove: false}));
+        const result = gameManager.makeTurn(data.username, data.move);
+        if(result?.err)
+        {
+          connection.socket.send(JSON.stringify({message: "Invalid turn", isValidMove: false}));
           return;
         }
-        const temp = games.get(data.username);
-        if(data.username !== temp.players[temp.turn] || data.move[0] < 0 || data.move[0] >= 6 || data.move[1] < 0 || data.move[1] >= 6 || temp.board[data.move[0]][data.move[1]] != ""){
-          connection.socket.send(JSON.stringify({message: "Wait, something's wrong with the turn", isValidMove: false}));
-          return;
-        }
-        temp.board[data.move[0]][data.move[1]] = temp.symbols[temp.turn];
-        advancedMode(temp.board, data.move[0], data.move[1]);
-        console.log(temp.board);
-        const winnerSymbol = winnerAlgo(temp.board).winner;
-        if(winnerSymbol){
-          const winner = temp.symbols.indexOf(winnerSymbol);
-          // Here will be some query to write rhe result to database
-          games.delete(temp.players[0]);
-          games.delete(temp.players[1]);
-          connection.socket.send(JSON.stringify({message: `Player ${winner} won!`, winner: winner}));
-          console.log(games);
-          return;
-        }
-        temp.turn = (temp.turn + 1) % 2;
-        connection.socket.send(JSON.stringify({message:"The move has been successfully added",isValidMove: true}));
-        return;
+        connection.socket.send(JSON.stringify({message: "Valid turn", isValidMove: true}));
       }
     });
   });
