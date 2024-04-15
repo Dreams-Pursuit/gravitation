@@ -1,10 +1,9 @@
 "use strict"
-const { databaseOperator } = require("../lib/databaseOperator.js");
+const dataBaseOperator = require("../lib/databaseOperator.js");
 const { hashPassword, validatePassword } = require("../lib/hash.js");
 const { generateToken, validateToken } = require("../lib/token.js");
 
 const user = async(fastify, options, done) => {
-    const {createUUID} = options;
     const regexp = /^[a-zA-Z0-9\s]*$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^[^\s,*]+$/;
@@ -15,12 +14,13 @@ const user = async(fastify, options, done) => {
             reply.code(400).send({message:"Bad credentials!"});
             return;
         }
-        if(await databaseOperator.userExists(data.email,data.username)){
+        const exists = await dataBaseOperator.read('players', { user_name : data.username })
+        if(exists.length != 0){
             reply.code(400).send({message: "This username and(or) email has already been used"});
             return;
         }
         const codedPassword = await hashPassword(data.password);
-        await databaseOperator.addUser(data.email, data.username, codedPassword);
+        dataBaseOperator.create('players', {user_name : data.username, user_email: data.email, user_password: codedPassword});
         const token = generateToken({username:data.username});
         reply.code(200).send({message: "The account has been successfully created!", token:token});
     });
@@ -30,14 +30,14 @@ const user = async(fastify, options, done) => {
             reply.code(400).send({message: "Bad format of credentials"});
             return;
         }
-        const credentials = await databaseOperator.getPasswordByEmail(data.email);
-        console.log(credentials);
+        const credentials = await dataBaseOperator.read('players', {user_email : data.email});
         if(credentials.length === 0){
             reply.code(400).send({message: "Account with this email does not exist!"});
             return;
         }
         if(await validatePassword(data.password,credentials[0].user_password)){
-            reply.code(200).send({message: "Successfully logged in!"});
+            const token = generateToken({username:credentials.user_name});
+            reply.code(200).send({message: "Successfully logged in!", token : token});
         }else{
             reply.code(400).send({message: "Failed to login, maybe wrong credentials!"});
         }
@@ -49,7 +49,7 @@ const user = async(fastify, options, done) => {
             reply.code(400).send({message: "Wrong format of user id!"});
             return;
         }
-        const user = await databaseOperator.userNameExists(userName);
+        const user = await dataBaseOperator.read('players', {user_name : userName});
         if(user.length === 0){
             reply.code(400).send({message: "This username does not exist!"});
             return;

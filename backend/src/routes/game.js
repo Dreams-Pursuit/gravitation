@@ -29,7 +29,7 @@ const game = async (fastify, options, done) => {
         {
           connection.socket.send("Something went wrong!");
         }
-        gameManager.gameQueue.joinQueue(data.username);
+        gameManager.gameQueue.queueEvents.emit('joinGame', data.username);
       }
       if (data.type === "move")
       {
@@ -48,7 +48,6 @@ const game = async (fastify, options, done) => {
       }
     });
   });
-  done();
 };
 
 module.exports = game;

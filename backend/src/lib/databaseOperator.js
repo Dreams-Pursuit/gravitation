@@ -1,43 +1,60 @@
 "use strict";
-const crud = require("./db.js");
-const playerTable = crud("players");
-class databaseOperator{
-  static async userExists(email, name) {
-    const response = await playerTable.read({
-          data:{
-              user_email:email,
-              user_name:name
-          },
-          logic:"OR"
-      });
-    return response.rows.length !== 0;
+
+class dataBaseOperator
+{
+  static db;
+  static InitializeDB(dataBaseInst)
+  {
+    dataBaseOperator.db = dataBaseInst;
   }
-  
-  static async addUser(email, name, password) {
-    await playerTable.create({
-          user_email:email,
-          user_name:name,
-          user_password:password
-    });
+  static async read(tableName, params)
+  {
+    const entries = Object.entries(params);
+    const whereClause = entries.length > 0 ? `WHERE ${entries.map(elem => `${elem[0]} = '${elem[1]}'`).join(' AND ')}` : ``;
+    const res = await dataBaseOperator.db.query(`SELECT * FROM ${tableName} ${whereClause}`);
+    return res.rows;
   }
-  static async userNameExists(name){
-    const response = await playerTable.read({
-      data:{
-        user_name:name
+  static update(tableName, params, newData)
+  {
+    const paramsEntries = Object.entries(params);
+    const newDataEntries = Object.entries(newData);
+    const whereClause = `WHERE ${paramsEntries.map(elem => elem.join(' = ')).join(' AND ')}`;
+    const updateClause = newDataEntries.map(elem => elem.join(' = ')).join(', ');
+    dataBaseOperator.db.query(`UPDATE ${tableName} SET (${updateClause}) ${whereClause}`, (err, res) => 
+    {
+      if(err)
+      {
+        console.log("Failed to update table ", err);
+      }
+    })
+  }
+  static delete(tableName, params)
+  {
+    const entries = Object.entries(params);
+    const whereClause = `WHERE ${entries.map(elem => elem.join(' = ').join(' AND '))}`;
+    dataBaseOperator.db.query(`DELETE FROM ${tableName} ${whereClause}`, (err, res) => 
+    {
+      if(err)
+      {
+        console.log("Failed to delete from the table", err);
+      }
+    })
+  }
+  static create(tableName, params)
+  {
+    const keys = Object.keys(params);
+    console.log(keys);
+    const values = Object.values(params);
+    console.log(values);
+    dataBaseOperator.db.query(`INSERT INTO ${tableName} (${keys.join(', ')}) VALUES (${values.map(elem => `'${elem}'`).join(', ')})`, 
+    (err, res) => 
+    {
+      if(err)
+      {
+        console.log("Failed to insert to the table ", err);
       }
     });
-    return response.rows;
-  }
-  
-  static async getPasswordByEmail(email){
-    const response = await playerTable.read({
-      data:{
-        user_email:email
-      }
-    });
-    return response.rows;
   }
 }
 
-
-module.exports = { databaseOperator };
+module.exports = dataBaseOperator;

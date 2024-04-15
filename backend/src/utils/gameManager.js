@@ -9,11 +9,9 @@ class gameManager
         gameManager.gameQueue = new gameQueue();
         gameManager.gameQueue.startQueue();
         gameManager.gameQueue.queueEvents.addListener('startNewGame', (first, second) => gameManager.startGame(first, second));
+        gameManager.gameQueue.queueEvents.addListener('joinGame', (username) => gameManager.gameQueue.joinQueue(username))
     }
     static startGame(frst, scnd){
-
-        //TODO: Check if the players exist
-
         const board = new Array(6).fill(0).map(elem => new Array(6).fill(""));
         const randomPlayer = Math.floor(Math.random() * Date.now()) % 2;
         const tempGame = {

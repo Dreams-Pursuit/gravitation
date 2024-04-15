@@ -5,7 +5,7 @@ const crypto = require("crypto");
 //Routes
 const game = require("./routes/game");
 const user = require("./routes/user");
-const build = (opts = {}) => {
+const build = async (opts = {}) => {
   const app = fastify(opts);
   app.register(require("@fastify/websocket"));
 
@@ -21,7 +21,7 @@ const build = (opts = {}) => {
   }).ready(err => {
     if (err) {
       console.error('Error connecting to PostgreSQL:', err);
-      process.exit(1); // Exit the process if connection fails
+      process.exit(1);
     }
     console.log('Connected to PostgreSQL database');
   });
