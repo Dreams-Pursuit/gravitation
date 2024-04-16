@@ -36,7 +36,7 @@ const user = async(fastify, options, done) => {
             return;
         }
         if(await validatePassword(data.password,credentials[0].user_password)){
-            const token = generateToken({username:credentials.user_name});
+            const token = generateToken({username:credentials[0].user_name});
             reply.code(200).send({message: "Successfully logged in!", token : token});
         }else{
             reply.code(400).send({message: "Failed to login, maybe wrong credentials!"});

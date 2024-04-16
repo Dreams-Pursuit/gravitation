@@ -3,8 +3,7 @@
 const GRID_HEIGHT = 6;
 const GRID_WIDTH = 6;
 
-
-function advancedMode(rows,row, col) {
+function advancedMode(rows, row, col) {
   for (let i = 1; i < GRID_HEIGHT; i++) {
     //The function is used for the "Advanced mode"
     for (let j = 0; j < GRID_WIDTH; j++) {
@@ -60,8 +59,8 @@ function winnerAlgo(rows) {
     for (let row = 1; row < GRID_HEIGHT; row++) {
       if (
         rows[row][(row + c) % GRID_WIDTH] ===
-            rows[row - 1][((row + c) % GRID_WIDTH) - 1] &&
-          rows[row][(row + c) % GRID_WIDTH] !== ""
+          rows[row - 1][((row + c) % GRID_WIDTH) - 1] &&
+        rows[row][(row + c) % GRID_WIDTH] !== ""
       ) {
         hitsRD++;
       } else hitsRD = 1;
@@ -77,8 +76,8 @@ function winnerAlgo(rows) {
     for (let row = 1; row < GRID_HEIGHT; row++) {
       if (
         rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] ===
-              rows[row - 1][(GRID_WIDTH - row + c) % GRID_WIDTH] &&
-              rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] !== ""
+          rows[row - 1][(GRID_WIDTH - row + c) % GRID_WIDTH] &&
+        rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] !== ""
       ) {
         hitsLD++;
       } else hitsLD = 1;
@@ -91,4 +90,4 @@ function winnerAlgo(rows) {
   return { winner: false };
 }
 
-module.exports = {winnerAlgo, advancedMode};
+module.exports = { winnerAlgo, advancedMode };
