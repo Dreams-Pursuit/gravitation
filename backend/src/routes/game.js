@@ -8,37 +8,25 @@ const game = async (fastify, options, done) => {
   const SOCKETS = {};
   function notifyPlayers(message, ids) {
     ids.forEach((playerID) => {
-      if (!SOCKETS.hasOwnProperty(playerID)) {
-        console.log("Player with this ID is not connected to the server");
-        return;
-      }
-      SOCKETS[playerID].send(message);
+      SOCKETS[playerID].send(JSON.stringify(message));
     });
-  }
-  function broadcast(message) {
-    for (const client of fastify.websocketServer.clients) {
-      client.send(JSON.stringify(message));
-    }
   }
 
   fastify.get("/play", { websocket: true }, (connection, req) => {
-    if (
-      !req.headers?.authorization ||
-      !req.headers?.username ||
-      validateToken(req.headers.authorization, req.headers.username) <= 0
-    ) {
-      connection.socket.send(
-        JSON.stringify({ sender: "server", message: "Invalid token" }),
-      );
-      connection.socket.close();
-      return;
-    }
+    // if (
+    //   !req.headers?.authorization ||
+    //   !req.headers?.username ||
+    //   validateToken(req.headers.authorization, req.headers.username) <= 0
+    // ) {
+    //   connection.socket.send(
+    //     JSON.stringify({ sender: "server", message: "Invalid token" }),
+    //   );
+    //   connection.socket.close();
+    //   return;
+    // }
     SOCKETS[req.headers.username] = connection.socket;
-    console.log(SOCKETS);
     SOCKETS[req.headers.username].on("close", () => {
       delete SOCKETS[req.headers.username];
-      console.log(SOCKETS);
-      broadcast({ sender: "server", message: "player disconnected" });
     });
 
     SOCKETS[req.headers.username].on("message", (message) => {
@@ -50,13 +38,14 @@ const game = async (fastify, options, done) => {
         return;
       }
       if (data.type === "join") {
-        if (!data?.username) {
-          SOCKETS[req.headers.username].send("Something went wrong!");
-        }
-        gameManager.gameQueue.queueEvents.emit("joinGame", data.username);
+        gameManager.gameQueue.queueEvents.emit(
+          "joinGame",
+          req.headers.username,
+        );
       }
       if (data.type === "move") {
-        if (!data?.move || !data?.username) {
+        console.log(req.headers.username);
+        if (!data?.move) {
           SOCKETS[req.headers.username].send(
             JSON.stringify({
               message: "Invalid data format",
@@ -65,14 +54,20 @@ const game = async (fastify, options, done) => {
           );
           return;
         }
-        const result = gameManager.makeTurn(data.username, data.move);
+        const result = gameManager.makeTurn(req.headers.username, data.move);
         if (result?.err) {
           SOCKETS[req.headers.username].send(
-            JSON.stringify({ message: "Invalid turn", isValidMove: false }),
+            JSON.stringify({
+              message: "Invalid turn",
+              isValidMove: false,
+              error: result.err,
+            }),
           );
           return;
         }
-        const players = gameManager.gameMap.get(req.headers.username).players;
+        const playerNames = gameManager.gameMap.get(
+          req.headers.username,
+        ).players;
         notifyPlayers(
           {
             turn: {
@@ -81,7 +76,7 @@ const game = async (fastify, options, done) => {
             },
             isValid: true,
           },
-          players,
+          playerNames,
         );
         return;
       }

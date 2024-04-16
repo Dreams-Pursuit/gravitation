@@ -49,7 +49,6 @@ class gameQueue {
       this.head = curr;
     }
     delete this.presence[temp.val];
-    console.log(temp.val);
     return temp.val;
   }
   startQueue() {

@@ -12,9 +12,13 @@ class gameManager {
       "startNewGame",
       (first, second) => gameManager.startGame(first, second),
     );
-    gameManager.gameQueue.queueEvents.addListener("joinGame", (username) =>
-      gameManager.gameQueue.joinQueue(username),
-    );
+    gameManager.gameQueue.queueEvents.addListener("joinGame", (username) => {
+      if (gameManager.gameMap.has(username)) {
+        console.log("Can't join the queue as player is already in the game");
+        return;
+      }
+      gameManager.gameQueue.joinQueue(username);
+    });
   }
   static startGame(frst, scnd) {
     const board = new Array(6).fill(0).map((elem) => new Array(6).fill(""));
@@ -41,6 +45,8 @@ class gameManager {
       return { err: "The game does not exist!" };
     }
     const game = gameManager.gameMap.get(player);
+    console.log(game.board);
+    console.log(game.players[game.turn]);
     if (
       game.players[game.turn] !== player ||
       turn?.row === null ||
