@@ -51,5 +51,3 @@ test("winnerAlgo", () => {
     assert.strictEqual(winnerAlgo(rows).winner, expected[i].winner);
   });
 });
-
-

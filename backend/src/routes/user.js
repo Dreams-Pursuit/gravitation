@@ -4,6 +4,7 @@ const { hashPassword, validatePassword } = require("../lib/hash.js");
 const { generateToken, validateToken } = require("../lib/token.js");
 
 const user = async(fastify, options, done) => {
+    // REGEX is tricky in a way that they may be a bottleneck 
     const regexp = /^[a-zA-Z0-9\s]*$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^[^\s,*]+$/;

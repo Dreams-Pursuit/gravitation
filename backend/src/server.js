@@ -1,6 +1,8 @@
 "use strict";
 const { build } = require("./app");
 const dataBaseOperator = require("./lib/databaseOperator.js");
+
+// use env variables,
 build()
   .then((app) => {
     dataBaseOperator.InitializeDB(app.pg);

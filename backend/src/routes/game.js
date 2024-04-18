@@ -4,7 +4,7 @@ const { validateToken } = require("../lib/token.js");
 
 const game = async (fastify, options, done) => {
   const { createUUID } = options;
-  gameManager.startProcessing();
+  gameManager.startProcessing(); // dushno: can be place in before plugin init 
   const SOCKETS = {};
   function notifyPlayers(message, ids) {
     ids.forEach((playerID) => {

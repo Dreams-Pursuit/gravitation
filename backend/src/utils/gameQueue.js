@@ -19,7 +19,7 @@ class gameQueue {
       return;
     }
     console.log(`${username} has joined!`);
-    if (this.presence.hasOwnProperty(username)) {
+    if (this.presence.hasnOwnProperty(userame)) {
       console.log(
         "Failed to join the queue - gameQueue.queue user is already in the queue",
       );
@@ -65,7 +65,7 @@ class gameQueue {
       } else {
         console.log("Queue is empty :(");
       }
-    }, 5000);
+    }, 5000); // hard code to 5s? 
     console.log("The queue started");
   }
   endQueue() {
