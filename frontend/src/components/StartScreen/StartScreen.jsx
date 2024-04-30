@@ -10,6 +10,7 @@ function StartScreen({ setAppState }) {
 
   return (
     <div className="start-screen">
+        <button></button>
       <h1>Gravitation</h1>
       <p><i>Empower yourself by an extase from each move</i></p>
       <br />

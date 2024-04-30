@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import { GRID_HEIGHT, GRID_WIDTH } from "../../functions/constants";
 import "../../css/PlayBoard.css";
 
-let randomPlayerValue = Math.random();
 function PlayBoard({ setAppState, config }) {
-  const playerSymbols = {};
-  getRandomPlayer(playerSymbols);
+  const players = [config.firstPlayer, config.secondPlayer];
+  const symbols = ["X", "O"];
   const [gameStage, setGameStage] = useState("Paused");
   const [rows, setRows] = useState(generateEmptyCellValues()); // Find a more efficient way
-  const [currentPlayer, setCurrentPlayer] = useState(playerSymbols.X);
+  const [currentPlayer, setCurrentPlayer] = useState(Math.floor(Math.random() * Date.now()) % 2);
   const [time, setTime] = useState(config.timerValue);
-  const [winner, setWinner] = useState("");
+  const [winner, setWinner] = useState(null);
 
   function generateEmptyCellValues() {
     const rows = new Array(GRID_HEIGHT)
@@ -23,11 +22,7 @@ function PlayBoard({ setAppState, config }) {
   function resetHandler(e) {
     e.preventDefault();
     setRows(generateEmptyCellValues());
-    randomPlayerValue = Math.random();
-    console.log(randomPlayerValue);
-    getRandomPlayer(playerSymbols);
-    console.log(playerSymbols);
-    setCurrentPlayer(playerSymbols.X);
+    setCurrentPlayer(Math.floor(Math.random() * Date.now()) % 2);
     setGameStage("Paused");
     setTime(config.timerValue);
     document.querySelectorAll(".board-cell").forEach((cell) => {
@@ -47,7 +42,7 @@ function PlayBoard({ setAppState, config }) {
         } else hitsHor = 1;
 
         if (hitsHor === 4) {
-          setWinner(rows[row][col]);
+          setWinner(rows[row][col] === "X" ? 0 : 1);
           return true;
         }
       }
@@ -62,7 +57,7 @@ function PlayBoard({ setAppState, config }) {
         } else hitsVer = 1;
 
         if (hitsVer === 4) {
-          setWinner(rows[row][col]);
+          setWinner(rows[row][col] === "X" ? 0 : 1);
           return true;
         }
       }
@@ -80,7 +75,7 @@ function PlayBoard({ setAppState, config }) {
         } else hitsRD = 1;
 
         if (hitsRD === 4) {
-          setWinner(rows[row][(row + c) % GRID_WIDTH]);
+          setWinner(rows[row][(row + c) % GRID_WIDTH] === "X" ? 0 : 1);
           return true;
         }
       }
@@ -98,7 +93,7 @@ function PlayBoard({ setAppState, config }) {
         } else hitsLD = 1;
 
         if (hitsLD === 4) {
-          setWinner(rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH]);
+          setWinner(rows[row][(GRID_WIDTH - 1 - row + c) % GRID_WIDTH] === "X" ? 0 : 1);
           return true;
         }
       }
@@ -106,7 +101,32 @@ function PlayBoard({ setAppState, config }) {
     return false;
   }
 
+  function advancedMode(rows, row, col) {
+    for (let i = 1; i < GRID_HEIGHT; i++) {
+      //The function is used for the "Advanced mode"
+      for (let j = 0; j < GRID_WIDTH; j++) {
+        //where you can put cross(X) or null(O) whereever you want
+        if (
+            (i != row || j != col) &&
+            rows[i - 1][j] === "" &&
+            rows[i][j] !== ""
+        ) {
+          //However in this case it will fall in case it has nothing
+          [rows[i][j], rows[i - 1][j]] = [rows[i - 1][j], rows[i][j]]; //under it.
+        }
+      }
+    }
+    return rows;
+  }
+  function classicMode(row, col) {
+    //function to validate index
+    return row === "0" || rows[row - 1][col] !== "";
+  }
+
   function cellHandler(cell) {
+    console.log(currentPlayer);
+    console.log(players[currentPlayer]);
+    console.log(symbols[currentPlayer]);
     const newRows = rows;
     const row = cell.target.getAttribute("data-row_index");
     const col = cell.target.getAttribute("data-col_index");
@@ -116,14 +136,14 @@ function PlayBoard({ setAppState, config }) {
         (config.gameMode === "classic" && classicMode(row, col)) ||
         config.gameMode === "advanced"
       ) {
-        cell.target.innerHTML = playerSymbols[currentPlayer];
-        rows[row][col] = playerSymbols[currentPlayer];
+        cell.target.innerHTML = symbols[currentPlayer];
+        rows[row][col] = symbols[currentPlayer];
         if (config.gameMode === "advanced") {
           advancedMode(row, col);
         }
       } else {
         console.log(
-          `Impossoble to put ${currentPlayer} here - not a based field!`,
+          `Impossoble to put ${symbols[currentPlayer]} here - not a based field!`,
         );
         return;
       }
@@ -132,9 +152,7 @@ function PlayBoard({ setAppState, config }) {
         setGameStage("Ended");
       } else {
         setCurrentPlayer(
-          currentPlayer === config.firstPlayer
-            ? config.secondPlayer
-            : config.firstPlayer,
+            (currentPlayer + 1) % 2
         );
         setTime(config.timerValue);
       }
@@ -166,9 +184,7 @@ function PlayBoard({ setAppState, config }) {
     if (gameStage === "Running" && config.timerValue !== 0) {
       if (time === 0) {
         setCurrentPlayer(
-          currentPlayer === config.firstPlayer
-            ? config.secondPlayer
-            : config.firstPlayer,
+          (currentPlayer + 1) % 2
         );
         setTime(config.timerValue);
       }
@@ -211,10 +227,10 @@ function PlayBoard({ setAppState, config }) {
       </div>
       <div>
         {gameStage === "Ended" ? (
-          <h3>The winner - {playerSymbols[winner]}!</h3>
+          <h3>The winner - {players[winner]}!</h3>
         ) : (
           <h3>
-            Your turn: {currentPlayer}({playerSymbols[currentPlayer]})
+            Your turn: {players[currentPlayer]}({symbols[currentPlayer]})
           </h3>
         )}
       </div>
